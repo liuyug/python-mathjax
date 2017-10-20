@@ -3,6 +3,7 @@
 
 import sys
 import site
+import os
 import os.path
 import urllib.request
 import zipfile
@@ -54,20 +55,24 @@ def unzip(src, dest=None, callback=None):
         zip_file.extract(f, dest)
 
 
-def installMathJax():
-    mathjax_url = 'https://github.com/mathjax/MathJax/archive/master.zip'
+def getPackageDirectory():
     package_paths = site.getsitepackages()
     package_paths.append(site.getusersitepackages())
     for path in package_paths:
-        if os.path.exists(os.path.join(path, 'pymathjax', '__init__.py')):
-            break
-    install_path = os.path.join(path, 'pymathjax')
+        if os.path.exists(
+                os.path.join(path, 'pymathjax', '__init__.py')):
+            return os.path.join(path, 'pymathjax')
+
+
+def installMathJax():
+    url = 'https://github.com/mathjax/MathJax/archive/master.zip'
+    install_path = getPackageDirectory()
     mathjax_zip = os.path.join(install_path, 'MathJax-master.zip')
     print("Install MathJax")
     print('download to "%s"' % mathjax_zip)
     count = 1
     while True:
-        dest = download(mathjax_url, mathjax_zip, progress_bar)
+        dest = download(url, mathjax_zip, progress_bar)
         if dest:
             break
         if count > 2:
@@ -78,10 +83,29 @@ def installMathJax():
     print('uncompress')
     unzip(mathjax_zip, dest=install_path, callback=progress_bar)
     print('\ncomplete!')
+    os.remove(mathjax_zip)
+
+
+def installSingleMathJax():
+    url = 'https://github.com/pkra/MathJax-single-file/raw/master/dist/TeXCommonHTMLTeX/MathJax.min.js'
+    install_path = getPackageDirectory()
+    dest = os.path.join(
+        install_path, 'MathJax.min.js')
+    print("Install Single MathJax")
+    download(url, dest, callback=progress_bar)
+    print('\ncomplete!')
 
 
 def getMathJax():
-    return os.path.join(
-        os.path.dirname(__file__),
-        'MathJax-master'
-    )
+    mathjax = os.path.join(
+        os.path.dirname(__file__), 'MathJax-master' 'MathJax.js')
+    if os.path.exists(mathjax):
+        return mathjax
+    return
+
+
+def getSingleMathJax():
+    mathjax = os.path.join(os.path.dirname(__file__), 'MathJax.min.js')
+    if os.path.exists(mathjax):
+        return mathjax
+    return

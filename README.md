@@ -15,6 +15,8 @@ to get install directory:
 ``` python
 
 import pymathjax
+pymathjax.getSingleMathJax()
+# or
 pymathjax.getMathJax()
 
 ```
